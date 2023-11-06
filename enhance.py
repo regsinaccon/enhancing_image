@@ -2,7 +2,7 @@ from PIL import Image
 import numpy 
 import time
 
-#sigma is approximately 63.5039
+# 63.5039
 #-2   -1   0     1      2  
 #0.5  64   127.5  191.5  254.5
 def float_to_interger(x:float):
@@ -20,7 +20,7 @@ def rgb_to_gray(red:int,green:int,blue:int):
 
 numbers_of_pixels=0
 pixels_sum_value=0    
-start=time.time()
+
 gray_list=numpy.empty((0,),dtype=numpy.int8)
 with Image.open('image2.png') as img:
     img_array = numpy.array(img)
@@ -32,8 +32,3 @@ for line in img_array:
         numbers_of_pixels += 1
         pixels_sum_value +=pixel_value
 prime_avg=float_to_interger(pixels_sum_value/numbers_of_pixels)
-# print(prime_avg)
-# end=time.time()
-# print(-(start-end))
-# saved_img=Image.fromarray(gray_list)
-# saved_img.save('new_image2.png')
