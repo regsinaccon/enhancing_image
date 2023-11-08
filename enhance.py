@@ -2,9 +2,8 @@ from PIL import Image
 import numpy 
 import time
 
-# 63.5039
-#-2   -1   0     1      2  
-#0.5  64   127.5  191.5  254.5
+
+
 def float_to_interger(x:float):
     if(x - int(x) >= 0.5):
         return int(x+1)
@@ -17,18 +16,25 @@ def rgb_to_gray(red:int,green:int,blue:int):
     return float_to_interger(sum)
 
 
-
+image=Image.open('image2.png')
 numbers_of_pixels=0
 pixels_sum_value=0    
+width,height=image.size
+origin_values = numpy.array(image)
+gray_values=numpy.zeros((height,width))
 
-gray_list=numpy.empty((0,),dtype=numpy.int8)
-with Image.open('image2.png') as img:
-    img_array = numpy.array(img)
+image_values=numpy.zeros((height,width))
+for rows in range(height) :
+    for coloums in range(width) :
+            red = origin_values[rows,coloums][0]
+            green = origin_values[rows,coloums][1]
+            blue = origin_values[rows,coloums][2]
+            gray_values[rows,coloums]=rgb_to_gray(red,green,blue)
+            #print(gray_values[rows][coloums])
+gray_image=Image.fromarray(gray_values.astype('uint8'))
+gray_image.save('newimage2.png')
 
-for line in img_array:
-    for pix in line:
-        pixel_value=rgb_to_gray(pix[0],pix[1],pix[2])
-        gray_list=numpy.append(gray_list,pixel_value)
-        numbers_of_pixels += 1
-        pixels_sum_value +=pixel_value
-prime_avg=float_to_interger(pixels_sum_value/numbers_of_pixels)
+
+
+# end=time.time()
+# print(-(start-end))
