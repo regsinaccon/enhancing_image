@@ -16,7 +16,7 @@ def rgb_to_gray(red:int,green:int,blue:int):
     return float_to_interger(sum)
 
 
-image=Image.open('image2.png')
+image=Image.open('input_image_path')
 numbers_of_pixels=0
 pixels_sum_value=0    
 width,height=image.size
@@ -32,9 +32,8 @@ for rows in range(height) :
             gray_values[rows,coloums]=rgb_to_gray(red,green,blue)
             #print(gray_values[rows][coloums])
 gray_image=Image.fromarray(gray_values.astype('uint8'))
-gray_image.save('newimage2.png')
+gray_image.save('out_put_image_path')
 
 
 
-# end=time.time()
-# print(-(start-end))
+
