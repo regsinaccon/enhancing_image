@@ -17,7 +17,7 @@ def rgb_to_gray(red:int,green:int,blue:int):
 
 
 
-image=Image.open('385541219_2236522123212993_3007922485834449612_n.jpg')
+image=Image.open('input_jpg_or_png_file')
 numbers_of_pixels=0
 pixels_sum_value=0    
 width,height=image.size
@@ -36,7 +36,7 @@ for rows in range(height) :
             percentage_of_each[temp] +=1 
 
 gray_image=Image.fromarray(gray_values.astype('uint8'))
-gray_image.save('newimage11_0.jpg')
+gray_image.save('origin image out put')
 
 len_of_arr=height*width
 
@@ -47,10 +47,10 @@ for i in range (1,256):
 for row in range(height):
     for column in range(width):
         gray_values[row,column]=float_to_interger(percentage_of_each[gray_values[row,column]]*255)
-        # print(int(gray_values[row,column]))
+        
         
 gray_image=Image.fromarray(gray_values.astype('uint8'))
-gray_image.save('newimage11_1.jpg')
+gray_image.save('processed image out put')
 
 
 
