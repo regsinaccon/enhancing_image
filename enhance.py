@@ -1,8 +1,15 @@
 from PIL import Image
 import numpy 
-import time
 
 
+'''
+
+
+
+this is a testing file to check the libraries the file that can be used is in main.py
+
+
+'''
 
 def float_to_interger(x:float):
     if(x - int(x) >= 0.5):
