@@ -54,7 +54,7 @@ def show_figure(array,save_to,title_name,Bins=256,color='gray'):
 
 start = time.time()
 
-image=Image.open('371293142_720401029983488_2050668120567634607_n.jpg')    
+image=Image.open('file path')    
 origin_values = numpy.array(image)
 width,height=image.size
 len_of_arr=height*width
@@ -71,8 +71,8 @@ gray_values = process_image(gray_values,PRarray,height,width)
 
 
 gray_image=Image.fromarray(gray_values.astype('uint8'))
-gray_image.save('newimage11_0.jpg')
+gray_image.save('output image')
 
 print(time.time()-start)
 
-show_figure(gray_values,'figure1','processed')
+show_figure(gray_values,'save file path','figure title')
