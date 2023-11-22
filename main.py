@@ -1,6 +1,6 @@
 from PIL import Image
 import numpy 
-import matplotlib
+import matplotlib.pyplot as plt
 import numba
 import time
 
@@ -45,6 +45,13 @@ def rating_values(len_of_arr,value_array,PRarray):
         PRarray[i] =PRarray[i]/len_of_arr +PRarray[i-1]
     return PRarray
 
+def show_figure(array,save_to,title_name,Bins=256,color='gray'):
+    plt.title(title_name)
+    plt.hist(array.ravel(),bins=Bins,color=color)
+    plt.savefig(save_to)
+    plt.show()
+
+
 start = time.time()
 
 image=Image.open('371293142_720401029983488_2050668120567634607_n.jpg')    
@@ -67,3 +74,5 @@ gray_image=Image.fromarray(gray_values.astype('uint8'))
 gray_image.save('newimage11_0.jpg')
 
 print(time.time()-start)
+
+show_figure(gray_values,'figure1','processed')
