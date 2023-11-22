@@ -1,56 +1,69 @@
 from PIL import Image
 import numpy 
 import matplotlib
+import numba
+import time
 
 
+@numba.jit(nopython=True)
 def float_to_interger(x:float):
     if(x - int(x) >= 0.5):
         return int(x+1)
     else:
         return int(x)
 
-
+@numba.jit(nopython=True)
 def rgb_to_gray(red:int,green:int,blue:int):
     sum=red*0.3+green*0.587+blue*0.114
     return float_to_interger(sum)
 
+@numba.jit(nopython=True)
+def extract_to_gray(array,emptyarray,PRarray,height,width):
 
+    for rows in range(height) :
+        for coloums in range(width) :
+                red = array[rows,coloums][0]
+                green = array[rows,coloums][1]
+                blue = array[rows,coloums][2]
+                temp= float_to_interger(red*0.2+blue*0.114+green*0.587)
+                emptyarray[rows,coloums] = temp
+                PRarray[temp] +=1
+    return  emptyarray
+    
+@numba.jit(nopython=True)
+def process_image(gray_values,PRarray,height,width):
+    for row in range(height):
+        for column in range(width):
+            gray_values[row,column]=int(PRarray[gray_values[row,column]]*255)
+    return gray_values
+        
 
+@numba.jit(nopython=True)
+def rating_values(len_of_arr,value_array,PRarray):
+    PRarray[0]=PRarray[0]/len_of_arr
+    for i in range (1,256):
+        PRarray[i] =PRarray[i]/len_of_arr +PRarray[i-1]
+    return PRarray
 
-image=Image.open('input_jpg_or_png_file')
-numbers_of_pixels=0
-pixels_sum_value=0    
-width,height=image.size
+start = time.time()
+
+image=Image.open('371293142_720401029983488_2050668120567634607_n.jpg')    
 origin_values = numpy.array(image)
-gray_values=numpy.zeros((height,width),dtype=int)
-percentage_of_each=numpy.zeros((256,))
-
-image_values=numpy.zeros((height,width))
-for rows in range(height) :
-    for coloums in range(width) :
-            red = origin_values[rows,coloums][0]
-            green = origin_values[rows,coloums][1]
-            blue = origin_values[rows,coloums][2]
-            temp=rgb_to_gray(red,green,blue)
-            gray_values[rows,coloums] = temp
-            percentage_of_each[temp] +=1 
-
-gray_image=Image.fromarray(gray_values.astype('uint8'))
-gray_image.save('origin image out put')
-
+width,height=image.size
 len_of_arr=height*width
 
-percentage_of_each[0]=percentage_of_each[0]/len_of_arr
-for i in range (1,256):
-    percentage_of_each[i] =percentage_of_each[i]/len_of_arr +percentage_of_each[i-1]
+gray_values=numpy.zeros((height,width),dtype=int)
+PRarray=numpy.zeros((256,))
+image_values=numpy.zeros((height,width))
 
-for row in range(height):
-    for column in range(width):
-        gray_values[row,column]=float_to_interger(percentage_of_each[gray_values[row,column]]*255)
-        
-        
+
+gray_values = extract_to_gray(origin_values,gray_values,PRarray,height,width)
+PRarray = rating_values(len_of_arr,gray_values,PRarray)
+gray_values = process_image(gray_values,PRarray,height,width)
+
+
+
 gray_image=Image.fromarray(gray_values.astype('uint8'))
-gray_image.save('processed image out put')
+gray_image.save('newimage11_0.jpg')
 
-
-
+print(time.time()-start)
