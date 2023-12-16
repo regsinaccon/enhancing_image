@@ -3,7 +3,7 @@ import numpy
 import matplotlib.pyplot as plt
 import numba
 import time
-
+import os
 
 @numba.jit(nopython=True)
 def float_to_interger(x:float):
@@ -45,34 +45,41 @@ def rating_values(len_of_arr,value_array,PRarray):
         PRarray[i] =PRarray[i]/len_of_arr +PRarray[i-1]
     return PRarray
 
-def show_figure(array,save_to,title_name,Bins=256,color='gray'):
+def set_figure(array,save_to,title_name,Bins=256,color='gray'):
     plt.title(title_name)
-    plt.hist(array.ravel(),bins=Bins,color=color)
+    plt.hist(array.ravel(),bins=Bins,color=color,range=(0,255))
     plt.savefig(save_to)
-    plt.show()
-
-
-start = time.time()
-
-image=Image.open('file path')    
-origin_values = numpy.array(image)
-width,height=image.size
-len_of_arr=height*width
-
-gray_values=numpy.zeros((height,width),dtype=int)
-PRarray=numpy.zeros((256,))
-image_values=numpy.zeros((height,width))
-
-
-gray_values = extract_to_gray(origin_values,gray_values,PRarray,height,width)
-PRarray = rating_values(len_of_arr,gray_values,PRarray)
-gray_values = process_image(gray_values,PRarray,height,width)
 
 
 
-gray_image=Image.fromarray(gray_values.astype('uint8'))
-gray_image.save('output image')
 
-print(time.time()-start)
+if __name__=="__main__":
+    open_image = input("select the input image file path:")
+    while os.path.exists(open_image)!=True:
+        open_image=input("file path error ,please try again:")
+    save_to = input("select the file path that the image be saved:")
+    image=Image.open(open_image) 
+#___________________________________________________________________________       
+    origin_values = numpy.array(image)
+    width,height=image.size
+    len_of_arr=height*width
+    gray_values=numpy.zeros((height,width),dtype=int)
+    PRarray=numpy.zeros((256,))
+    image_values=numpy.zeros((height,width))
+#___________________________________________________________________________
 
-show_figure(gray_values,'save file path','figure title')
+    gray_values = extract_to_gray(origin_values,gray_values,PRarray,height,width)
+    gray_image = Image.fromarray(gray_values.astype('uint8'))
+    gray_image.save(save_to)
+    set_figure(gray_values,'figure2','origin image',color='red')
+
+    PRarray = rating_values(len_of_arr,gray_values,PRarray)
+    gray_values = process_image(gray_values,PRarray,height,width)
+
+
+
+    gray_image = Image.fromarray(gray_values.astype('uint8'))
+    gray_image.save(save_to)
+    set_figure(gray_values,'figure1','after processed',color='green')
+    
+
