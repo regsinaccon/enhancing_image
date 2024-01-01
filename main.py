@@ -13,11 +13,6 @@ def float_to_interger(x:float):
         return int(x)
 
 @numba.jit(nopython=True)
-def rgb_to_gray(red:int,green:int,blue:int):
-    sum=red*0.3+green*0.587+blue*0.114
-    return float_to_interger(sum)
-
-@numba.jit(nopython=True)
 def extract_to_gray(array,emptyarray,PRarray,height,width):
 
     for rows in range(height) :
@@ -25,7 +20,7 @@ def extract_to_gray(array,emptyarray,PRarray,height,width):
                 red = array[rows,coloums][0]
                 green = array[rows,coloums][1]
                 blue = array[rows,coloums][2]
-                temp= float_to_interger(red*0.2+blue*0.114+green*0.587)
+                temp= float_to_interger(red*0.299+blue*0.114+green*0.587)
                 emptyarray[rows,coloums] = temp
                 PRarray[temp] +=1
     return  emptyarray
@@ -50,8 +45,20 @@ def set_figure(array,save_to,title_name,Bins=256,color='gray'):
     plt.hist(array.ravel(),bins=Bins,color=color,range=(0,255))
     plt.savefig(save_to)
 
+@numba.jit(nopython=True)
+def median_filter(input_array):
+    m, n = input_array.shape
+    output_array = numpy.zeros((m,n),dtype=numpy.int32)
+    for i in range(m):
+        for j in range(n):
+            neighbors = []
+            for k in range(max(0, i-2), min(i+3, m)):
+                for l in range(max(0, j-2), min(j+3, n)):
+                    neighbors.append(input_array[k][l])
 
-
+            output_array[i][j] = numpy.sort(neighbors)[len(neighbors)//2]
+# sorted function invalid in jit
+    return output_array
 
 if __name__=="__main__":
     open_image = input("select the input image file path:")
@@ -75,6 +82,7 @@ if __name__=="__main__":
 
     PRarray = rating_values(len_of_arr,gray_values,PRarray)
     gray_values = process_image(gray_values,PRarray,height,width)
+    gray_values = median_filter(gray_values)
 
 
 
