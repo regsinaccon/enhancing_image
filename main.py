@@ -4,6 +4,7 @@ import matplotlib.pyplot as plt
 import numba
 import time
 import os
+import time
 
 @numba.jit(nopython=True)
 def float_to_interger(x:float):
@@ -51,13 +52,29 @@ def median_filter(input_array):
     output_array = numpy.zeros((m,n),dtype=numpy.int32)
     for i in range(m):
         for j in range(n):
-            neighbors = []
+            neighbors = numpy.zeros((9,),dtype=numpy.int32)
+            sequence = 0
             for k in range(max(0, i-2), min(i+3, m)):
                 for l in range(max(0, j-2), min(j+3, n)):
-                    neighbors.append(input_array[k][l])
-
-            output_array[i][j] = numpy.sort(neighbors)[len(neighbors)//2]
+                    neighbors[sequence] = input_array[k][l]
+                    sequence += 1
+#mask size:2
+            output_array[i][j] = numpy.sort(neighbors)[4]
 # sorted function invalid in jit
+    return output_array
+
+@numba.jit(nopython=True)
+def sharp_image(input_array):
+    m, n = input_array.shape
+    output_array = numpy.zeros((m,n),dtype=numpy.int32)
+    for i in range(1,m-1):
+        for j in range(1,n-1):
+            sumval = 0
+            for k in range(max(1, i-1), min(i+2, m-1)):
+                for l in range(max(1, j-1), min(j+2, n-1)):
+                    sumval -= input_array[k][l] 
+            output_array[i][j] = sumval+(input_array[i][j]*6)
+#mask size:1
     return output_array
 
 if __name__=="__main__":
@@ -65,29 +82,35 @@ if __name__=="__main__":
     while os.path.exists(open_image)!=True:
         open_image=input("file path error ,please try again:")
     save_to = input("select the file path that the image be saved:")
+    
+    to_sharp = input("want to make bigger contrast(yes/no):")
+        
+    start = time.time()
     image=Image.open(open_image) 
-#___________________________________________________________________________       
+#___________________________________________________________________________#       
     origin_values = numpy.array(image)
     width,height=image.size
     len_of_arr=height*width
     gray_values=numpy.zeros((height,width),dtype=int)
     PRarray=numpy.zeros((256,))
     image_values=numpy.zeros((height,width))
-#___________________________________________________________________________
+#___________________________________________________________________________#
 
     gray_values = extract_to_gray(origin_values,gray_values,PRarray,height,width)
     gray_image = Image.fromarray(gray_values.astype('uint8'))
     gray_image.save(save_to)
     set_figure(gray_values,'figure2','origin image',color='red')
-
+        
     PRarray = rating_values(len_of_arr,gray_values,PRarray)
     gray_values = process_image(gray_values,PRarray,height,width)
-    gray_values = median_filter(gray_values)
 
+    # gray_values = median_filter(gray_values)
+
+    if to_sharp=='yes':
+        gray_values = sharp_image(gray_values)
 
 
     gray_image = Image.fromarray(gray_values.astype('uint8'))
     gray_image.save(save_to)
     set_figure(gray_values,'figure1','after processed',color='green')
-    
-
+    print(f"process done after {time.time()-start} second")    
