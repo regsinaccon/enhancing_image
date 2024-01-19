@@ -35,10 +35,12 @@ def process_image(gray_values,PRarray,height,width):
         
 
 @numba.jit(nopython=True)
-def rating_values(len_of_arr,value_array,PRarray):
+def rating_values(len_of_arr,value_array,PRarray,balance):
     PRarray[0]=PRarray[0]/len_of_arr
     for i in range (1,256):
         PRarray[i] =PRarray[i]/len_of_arr +PRarray[i-1]
+        if PRarray[i] - PRarray[i-1]>=0.1:
+            PRarray -= balance
     return PRarray
 
 def set_figure(array,save_to,title_name,Bins=256,color='gray'):
@@ -101,10 +103,10 @@ if __name__=="__main__":
     gray_image.save(save_to)
     set_figure(gray_values,'figure2','origin image',color='red')
         
-    PRarray = rating_values(len_of_arr,gray_values,PRarray)
+    PRarray = rating_values(len_of_arr,gray_values,PRarray,balance=0.03)
     gray_values = process_image(gray_values,PRarray,height,width)
 
-    # gray_values = median_filter(gray_values)
+    # gray_values = median_filter(gray_values)  
 
     if to_sharp=='yes':
         gray_values = sharp_image(gray_values)
