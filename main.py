@@ -81,7 +81,7 @@ def sharp_image(input_array,Excute_type):
                     output_array[row][column] += input_array[row-1][column] -input_array[row][column+1]
 #mask size:1
     return output_array
-# @numba.jit(nopython=True)
+@numba.jit(nopython=True)
 def Combine(array):
 
     Excute_type = 0
